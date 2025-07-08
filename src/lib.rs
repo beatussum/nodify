@@ -21,7 +21,7 @@ pub trait Node {
     ///
     /// The idea behind this type is to provide a way for iterating over the
     /// outgoing [node](Node).
-    type Outgoing<'this>: Iterator
+    type Outgoing<'this>: Iterator<Item = Self>
     where
         Self: 'this;
 
