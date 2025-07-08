@@ -10,22 +10,22 @@
 pub mod process;
 use process::Process;
 
-/// A trait representing a [graph `Node`](Node).
+/// A trait representing a [graph node](Node).
 ///
-/// This trait is based on the [`.children()`](Node::children), which allows to
-/// get the children of the [`Node`]. Using this method, it is possible to
-/// implement [`Process`es](Process) which rely on this method to travel the
-/// graph.
+/// This trait is based on the [`.outgoing()`](Node::outgoing), which allows to
+/// get the outgoing [node](Node) of the current one. Using this method, it is
+/// possible to implement [`Process`es](Process) which rely on this method to
+/// travel the graph.
 pub trait Node {
     /// The outgoing neighbor type
     ///
     /// The idea behind this type is to provide a way for iterating over the
-    /// outgoing node.
+    /// outgoing [node](Node).
     type Outgoing<'this>: Iterator
     where
         Self: 'this;
 
-    /// Get the outgoing neighbors of the current Node
+    /// Get the outgoing neighbors of the current [node](Node)
     fn outgoing(&self) -> Self::Outgoing<'_>;
 
     /// Get the associated [`Process`] according to the given `P`

@@ -1,6 +1,6 @@
 //! Many different processes
 //!
-//! This modules contains several different [`Process`es](Process)
+//! This module contains several different [`Process`es](Process)
 
 pub mod parallel_dfs;
 
