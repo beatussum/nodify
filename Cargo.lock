@@ -117,6 +117,7 @@ name = "nodify"
 version = "0.1.0"
 dependencies = [
  "ahash",
+ "cfg-if",
  "dashmap",
  "rand",
  "rayon",

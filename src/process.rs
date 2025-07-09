@@ -2,10 +2,17 @@
 //!
 //! This module contains several different [`Process`es](Process)
 
-#[cfg(feature = "rayon")]
-pub mod parallel_dfs;
+use cfg_if::cfg_if;
 
 pub mod dfs;
+pub use dfs::DFS;
+
+cfg_if! {
+    if #[cfg(feature = "rayon")] {
+        pub mod parallel_dfs;
+        pub use parallel_dfs::ParallelDFS;
+    }
+}
 
 use crate::Node;
 
