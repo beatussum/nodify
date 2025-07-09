@@ -1,8 +1,6 @@
-//! # Graphex
+//! # nodify
 //!
-//! _Graphex_ means **Graph** **ex**plore.
-//!
-//! ## Why should I use Graphex?
+//! ## Why should I use nodify?
 //!
 //! This crate aims to provide an easy way to implement graph algorithms like
 //! graph routing and path finding.

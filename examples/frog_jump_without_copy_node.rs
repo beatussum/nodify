@@ -2,7 +2,7 @@
 //!
 //! In this example, [`FrogNode`] is not [`Copy`iable](Copy).
 
-use graphex::{
+use nodify::{
     Node,
     process::{ContainsAny, parallel_dfs::ParallelDFS},
 };

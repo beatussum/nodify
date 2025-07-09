@@ -1,10 +1,10 @@
 [package]
-name = "graphex"
+name = "nodify"
 version = "0.1.0"
 authors = ["Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com>"]
 edition = "2024"
 description = "A small crate providing utilies to explore graph (boosted by Rayon)"
-repository = "https://github.com/beatussum/graphex"
+repository = "https://github.com/beatussum/nodify"
 license = "GPL-3.0-or-later"
 keywords = ["algorithms", "graph"]
 categories = ["algorithms"]
