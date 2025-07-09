@@ -17,10 +17,8 @@ pub trait Process {
 
 /// A [`Process`] allowing to check if a graph contains any [`crate::Node`]
 /// verifying a given predicate
-pub trait ContainsAny: Process {
+pub trait ContainsAny<P>: Process {
     /// Check if a graph contains any [`crate::Node`] verifying the given
     /// predicate `pred`
-    fn contains_any<P>(&self, pred: P) -> bool
-    where
-        P: Fn(&Self) -> bool;
+    fn contains_any(&self, pred: P) -> bool;
 }
