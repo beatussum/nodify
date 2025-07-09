@@ -2,6 +2,7 @@
 //!
 //! This module contains several different [`Process`es](Process)
 
+#[cfg(feature = "rayon")]
 pub mod parallel_dfs;
 
 use crate::Node;
