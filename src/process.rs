@@ -2,6 +2,7 @@
 //!
 //! This module contains several different [`Process`es](Process)
 
+use crate::Node;
 use cfg_if::cfg_if;
 
 pub mod dfs;
@@ -13,8 +14,6 @@ cfg_if! {
         pub use parallel_dfs::ParallelDFS;
     }
 }
-
-use crate::Node;
 
 /// A [`Process`] allowing to apply some transformations to a [`crate::Node`]
 pub trait Process {
