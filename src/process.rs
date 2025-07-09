@@ -5,6 +5,8 @@
 #[cfg(feature = "rayon")]
 pub mod parallel_dfs;
 
+pub mod dfs;
+
 use crate::Node;
 
 /// A [`Process`] allowing to apply some transformations to a [`crate::Node`]
