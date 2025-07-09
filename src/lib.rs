@@ -5,7 +5,9 @@
 //! This crate aims to provide an easy way to implement graph algorithms like
 //! graph routing and path finding.
 
+pub mod prelude;
 pub mod process;
+
 use process::Process;
 
 /// A trait representing a [graph node](Node).

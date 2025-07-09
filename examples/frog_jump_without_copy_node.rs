@@ -2,11 +2,7 @@
 //!
 //! In this example, [`FrogNode`] is not [`Copy`iable](Copy).
 
-use nodify::{
-    Node,
-    process::{ContainsAny, parallel_dfs::ParallelDFS},
-};
-
+use nodify::prelude::*;
 use rand::random_bool;
 
 use std::{
