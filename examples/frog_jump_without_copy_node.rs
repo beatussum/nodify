@@ -77,7 +77,7 @@ impl Hash for FrogNode {
 ///
 /// The previously built outgoing nodes are used.
 ///
-/// Please note that the trait is implemented for `& FrogNode` and not `FrogNode`.
+/// Please note that the trait is implemented for `&FrogNode` and not `FrogNode`.
 impl Node for &FrogNode {
     fn outgoing(self) -> impl Iterator<Item = Self> {
         self.outgoing.iter()
