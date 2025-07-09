@@ -17,22 +17,15 @@ use process::Process;
 /// possible to implement [`Process`es](Process) which rely on this method to
 /// travel the graph.
 pub trait Node {
-    /// The outgoing neighbor type
-    ///
-    /// The idea behind this type is to provide a way for iterating over the
-    /// outgoing [node](Node).
-    type Outgoing<'this>: Iterator<Item = Self>
-    where
-        Self: 'this;
-
     /// Get the outgoing neighbors of the current [node](Node)
-    fn outgoing(&self) -> Self::Outgoing<'_>;
+    fn outgoing(self) -> impl Iterator<Item = Self>;
 
     /// Get the associated [`Process`] according to the given `P`
-    fn process<'this, P>(&'this self) -> P
+    fn process<P>(self) -> P
     where
-        P: Process + From<&'this Self>,
+        P: Process<Node = Self>,
+        Self: Sized,
     {
-        self.into()
+        P::from_node(self)
     }
 }

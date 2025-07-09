@@ -4,10 +4,16 @@
 
 pub mod parallel_dfs;
 
+use crate::Node;
+
 /// A [`Process`] allowing to apply some transformations to a [`crate::Node`]
-///
-/// This trait is just a [marker](std::marker).
-pub trait Process {}
+pub trait Process {
+    /// The underlying [`Node`] type of this [`Process`]
+    type Node: Node;
+
+    /// Build a [`Process`] from a [`Node`]
+    fn from_node(node: Self::Node) -> Self;
+}
 
 /// A [`Process`] allowing to check if a graph contains any [`crate::Node`]
 /// verifying a given predicate
