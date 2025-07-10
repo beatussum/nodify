@@ -23,107 +23,59 @@ All processes and process implementations are stored under `nodify::process::*`
 ## Example
 
 ```rust
-//! This example is based on the [403. Frog Jump](https://leetcode.com/problems/frog-jump/) LeetCode problem
-//!
-//! In this example, [`FrogNode`] is [`Copy`iable](Copy).
+//! Nodify the Fibonnacci sequence
 
 use nodify::prelude::*;
-use rand::random_bool;
+use std::iter::once;
 
-use std::{
-    hash::{Hash, Hasher},
-    iter::once,
-    time::Instant,
-};
-
-/// A node representing the frog state
+/// A node representing the current state of the sequence
 ///
-/// This node is characterized by
-/// - the frog's position, and
-/// - the frog's speed.
-///
-/// Moreover, the `has_stone` slice is used to compute outgoing nodes according to the stone
-/// configuration.
-#[derive(Clone, Copy, Debug, Eq)]
-pub struct FrogNode<'a> {
-    /// The frog's position
-    pub position: usize,
+/// This trait need to be [`Eq`] and [`Hash`] due to the [`DFS`] process implementation used. It
+/// needs also to be [`Copy`] in order to be used without reference.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct FiboNode {
+    /// The previous term value
+    pub previous: u64,
 
-    /// The frog's speed
-    pub speed: usize,
-
-    /// The stone configuration
-    pub has_stone: &'a [bool],
+    /// The current term value
+    pub current: u64,
 }
 
-/// [`PartialEq`] trait implementation
-///
-/// Only the frog's position and speed are used.
-impl PartialEq for FrogNode<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        self.position == other.position && self.speed == other.speed
+impl FiboNode {
+    /// Get the first [node](FiboNode) of the sequence
+    ///
+    /// It corresponds to the two first values of the sequence.
+    pub fn first() -> Self {
+        Self {
+            previous: 0,
+            current: 1,
+        }
     }
 }
 
-/// [`Hash`] trait implementation
-///
-/// Only the frog's position and speed are used.
-impl Hash for FrogNode<'_> {
-    fn hash<H>(&self, state: &mut H)
-    where
-        H: Hasher,
-    {
-        (self.position, self.speed).hash(state);
-    }
-}
-
-impl Node for FrogNode<'_> {
+impl Node for FiboNode {
     fn outgoing(self) -> impl Iterator<Item = Self> {
-        let small_speed = self.speed - 1;
-        let big_speed = self.speed + 1;
-        let big_position = self.position + big_speed;
+        let next = Self {
+            previous: self.current,
+            current: self.previous + self.current,
+        };
 
-        Some((big_position, big_speed))
-            .into_iter()
-            .chain((small_speed > 0).then_some((self.position + small_speed, small_speed)))
-            .chain(Some((self.position + self.speed, self.speed)))
-            .filter(|&(p, _)| self.has_stone.get(p).copied().unwrap_or(false))
-            .map(move |(position, speed)| Self {
-                position,
-                speed,
-                has_stone: self.has_stone,
-            })
+        once(next)
     }
 }
 
 fn main() {
-    let has_stone = (2..1_000_000).map(|_| random_bool(0.8));
+    let first = FiboNode::first();
 
-    let has_stone = once(true)
-        .chain(has_stone)
-        .chain(once(true))
-        .collect::<Vec<_>>();
+    let result = first
+        .process::<DFS<_>>()
+        .contains_any(|FiboNode { current, .. }| current == 610);
 
-    let root = FrogNode {
-        position: 0,
-        speed: 1,
-        has_stone: &has_stone,
-    };
-
-    let start = Instant::now();
-
-    let is_solvable = root
-        .process::<ParallelDFS<_>>()
-        .contains_any(|FrogNode { position, .. }| position == has_stone.len() - 1);
-
-    let stop = start.elapsed();
-
-    println!("{root:?}");
-    println!("=> {is_solvable} ({stop:?})");
+    println!("{first:?} => {result}");
 }
 ```
 
-You can consult this example at [`examples/frog_jump_with_copy_node.rs`](examples/frog_jump_with_copy_node.rs).
+You can consult this example at [`examples/fibonacci.rs`](examples/fibonacci.rs).
 
 ## Building
 
