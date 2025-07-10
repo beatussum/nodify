@@ -5,6 +5,9 @@
 //! This crate aims to provide an easy way to implement graph algorithms like
 //! graph routing and path finding.
 
+#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
 pub mod prelude;
 pub mod process;
 
