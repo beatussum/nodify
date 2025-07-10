@@ -138,7 +138,7 @@ This project is based on the [Cargo](https://doc.rust-lang.org/cargo/) package m
 
 ### Using as a dependency
 
-```console
+```bash
 cargo add nodify
 ```
 
@@ -153,16 +153,16 @@ cargo add nodify
 
 1. Clone this repository.
 
-```console
-git clone "https://github.com/beatussum/nodify.git"
-```
+   ```bash
+   git clone "https://github.com/beatussum/nodify.git"
+   ```
 
 1. Build the crate.
 
-```console
-cargo build -r # (-r for release build), or
-cargo build -r -F <features> # if you want to set non default features
-```
+   ```bash
+   cargo build -r # (-r for release build), or
+   cargo build -r -F <features> # if you want to set non default features
+   ```
 
 ## Licenses
 
