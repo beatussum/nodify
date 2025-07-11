@@ -20,15 +20,15 @@ use process::Process;
 /// possible to implement [`Process`es](Process) which rely on this method to
 /// travel the graph.
 pub trait Node {
-    /// Get the outgoing neighbors of the current [node](Node)
-    fn outgoing(self) -> impl Iterator<Item = Self>;
-
     /// Get the associated [`Process`] according to the given `P`
-    fn process<P>(self) -> P
+    fn as_process<P>(self) -> P
     where
         P: Process<Node = Self>,
         Self: Sized,
     {
-        P::from_node(self)
+        Process::from_node(self)
     }
+
+    /// Get the outgoing neighbors of the current [node](Node)
+    fn outgoing(self) -> impl Iterator<Item = Self>;
 }
