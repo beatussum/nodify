@@ -35,12 +35,7 @@
 //!             once(next)
 //!         })
 //!         .as_process::<DFS<_>>()
-//!         .contains_any(
-//!             |Nodifyied {
-//!                  current: FiboNode { current, .. },
-//!                  ..
-//!              }| current == 610,
-//!         );
+//!         .contains_any(|FiboNode { current, .. }| current == 610);
 //!
 //!     println!("{first:?} => {result}");
 //! }
@@ -102,10 +97,19 @@ where
     F: Copy + Fn(C) -> R,
     R: Iterator<Item = C>,
 {
+    type Value = C;
+
     fn outgoing(self) -> impl Iterator<Item = Self> {
         (*self.outgoing_wrapper)(self.current).map(|current| Nodifyied {
             current,
             outgoing_wrapper: self.outgoing_wrapper,
         })
+    }
+
+    fn value(self) -> Self::Value
+    where
+        Self: Sized,
+    {
+        self.current
     }
 }

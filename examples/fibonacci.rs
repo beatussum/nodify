@@ -29,6 +29,8 @@ impl FiboNode {
 }
 
 impl Node for FiboNode {
+    type Value = Self;
+
     fn outgoing(self) -> impl Iterator<Item = Self> {
         let next = Self {
             previous: self.current,
@@ -36,6 +38,10 @@ impl Node for FiboNode {
         };
 
         once(next)
+    }
+
+    fn value(self) -> Self::Value {
+        self
     }
 }
 

@@ -28,7 +28,7 @@ where
 impl<N, P> ContainsAny<P> for ParallelDFS<N>
 where
     N: Copy + Eq + Hash + Node + Send + Sync,
-    P: Fn(Self::Node) -> bool + Sync,
+    P: Fn(N::Value) -> bool + Sync,
 {
     fn contains_any(&self, pred: P) -> bool {
         use rayon::prelude::*;
@@ -41,7 +41,7 @@ where
         ) -> Option<Vec<N>>
         where
             N: Copy + Eq + Hash + Node,
-            P: Fn(N) -> bool,
+            P: Fn(N::Value) -> bool,
         {
             for _ in 0..threshold {
                 match to_visit.pop() {
@@ -52,7 +52,7 @@ where
                             let next = node.outgoing().filter(|node| !is_visited.contains(node));
 
                             for node in next {
-                                if pred(node) {
+                                if pred(node.value()) {
                                     return None;
                                 } else {
                                     to_visit.push(node);

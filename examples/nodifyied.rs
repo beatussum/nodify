@@ -40,12 +40,7 @@ fn main() {
             once(next)
         })
         .as_process::<DFS<_>>()
-        .contains_any(
-            |Nodifyied {
-                 current: FiboNode { current, .. },
-                 ..
-             }| current == 610,
-        );
+        .contains_any(|FiboNode { current, .. }| current == 610);
 
     println!("{first:?} => {result}");
 }

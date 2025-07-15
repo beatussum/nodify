@@ -79,8 +79,14 @@ impl Hash for FrogNode {
 ///
 /// Please note that the trait is implemented for `&FrogNode` and not `FrogNode`.
 impl Node for &FrogNode {
+    type Value = Self;
+
     fn outgoing(self) -> impl Iterator<Item = Self> {
         self.outgoing.iter()
+    }
+
+    fn value(self) -> Self::Value {
+        self
     }
 }
 

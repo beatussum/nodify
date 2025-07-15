@@ -21,6 +21,38 @@ use process::Process;
 /// possible to implement [`Process`es](Process) which rely on this method to
 /// travel the graph.
 pub trait Node {
+    /// The underlying value of the [node](Node)
+    ///
+    /// Sometimes, it is necessary to have a different _value type_ from the _node type_. In
+    /// particular, [`nodifyied`] needs that.
+    ///
+    /// # Implementation
+    ///
+    /// Due to language limitations,
+    /// [_associated types defaults_](https://github.com/rust-lang/rust/issues/29661) are not yet
+    /// supported; for this reason, this associated type is not defaulted to `Self` although this
+    /// is the majority of cases.
+    ///
+    /// ```
+    /// use nodify::prelude::*;
+    /// use std::iter::empty;
+    ///
+    /// pub struct FooNode;
+    ///
+    /// impl Node for FooNode {
+    ///     type Value = Self;
+    ///
+    ///     fn outgoing(self) -> impl Iterator<Item = Self> {
+    ///         empty()
+    ///     }
+    ///
+    ///     fn value(self) -> Self::Value {
+    ///         self
+    ///     }
+    /// }
+    /// ```
+    type Value;
+
     /// Get the associated [`Process`] according to the given `P`
     fn as_process<P>(self) -> P
     where
@@ -32,4 +64,7 @@ pub trait Node {
 
     /// Get the outgoing neighbors of the current [node](Node)
     fn outgoing(self) -> impl Iterator<Item = Self>;
+
+    /// Get the underlying value of the [node](Node)
+    fn value(self) -> Self::Value;
 }
