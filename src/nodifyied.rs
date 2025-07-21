@@ -35,7 +35,7 @@
 //!             once(next)
 //!         })
 //!         .as_process::<DFS<_>>()
-//!         .contains_any(|FiboNode { current, .. }| current == 610);
+//!         .contains(|FiboNode { current, .. }| current == 610);
 //!
 //!     println!("{first:?} => {result}");
 //! }

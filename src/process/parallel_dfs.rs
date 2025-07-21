@@ -1,6 +1,6 @@
 //! This module contains the implementation of [`ParallelDFS`]
 
-use super::{ContainsAny, Process};
+use super::{FindAny, Process};
 use crate::Node;
 use std::{collections::LinkedList, hash::Hash};
 
@@ -9,7 +9,7 @@ type HashSet<K> = dashmap::DashSet<K, ahash::RandomState>;
 /// A parallel [DFS](https://en.wikipedia.org/wiki/Depth-first_search) implementation of some processes
 ///
 /// In particular, the following [`Process`es](Process) are implemented:
-/// - [`ContainsAny`].
+/// - [`FindAny`].
 pub struct ParallelDFS<N> {
     node: N,
 }
@@ -25,20 +25,20 @@ where
     }
 }
 
-impl<N, P> ContainsAny<P> for ParallelDFS<N>
+impl<N, P> FindAny<P> for ParallelDFS<N>
 where
     N: Copy + Eq + Hash + Node + Send + Sync,
     P: Fn(N::Value) -> bool + Sync,
 {
-    fn contains_any(&self, pred: P) -> bool {
+    fn find_any(&self, pred: P) -> Option<Self::Node> {
         use rayon::prelude::*;
 
-        fn contains_any_until<N, P>(
+        fn next_until<N, P>(
             is_visited: &HashSet<N>,
             mut to_visit: Vec<N>,
             threshold: usize,
             pred: &P,
-        ) -> Option<Vec<N>>
+        ) -> Result<Vec<N>, N>
         where
             N: Copy + Eq + Hash + Node,
             P: Fn(N::Value) -> bool,
@@ -53,7 +53,7 @@ where
 
                             for node in next {
                                 if pred(node.value()) {
-                                    return None;
+                                    return Err(node);
                                 } else {
                                     to_visit.push(node);
                                 }
@@ -63,7 +63,7 @@ where
                 }
             }
 
-            Some(to_visit)
+            Ok(to_visit)
         }
 
         let max_task = rayon::current_num_threads();
@@ -76,24 +76,24 @@ where
             let len = to_visit.len();
 
             if len < max_task {
-                let next = contains_any_until(&is_visited, to_visit, threshold, &pred);
+                let next = next_until(&is_visited, to_visit, threshold, &pred);
 
                 match next {
-                    Some(next) => to_visit = next,
-                    None => return true,
+                    Ok(next) => to_visit = next,
+                    Err(ret) => return Some(ret),
                 }
             } else {
                 let next = to_visit
                     .par_drain(len.saturating_sub(max_task)..)
                     .chunks(1)
                     .try_fold(LinkedList::new, |mut next, to_visit| {
-                        let to_push = contains_any_until(&is_visited, to_visit, threshold, &pred)?;
+                        let to_push = next_until(&is_visited, to_visit, threshold, &pred)?;
                         next.push_back(to_push);
-                        Some(next)
+                        Ok(next)
                     })
                     .try_reduce(LinkedList::new, |mut lhs, mut rhs| {
                         lhs.append(&mut rhs);
-                        Some(lhs)
+                        Ok(lhs)
                     })
                     .map(|list| {
                         list.into_iter()
@@ -105,12 +105,12 @@ where
                     });
 
                 match next {
-                    Some(mut next) => to_visit.append(&mut next),
-                    None => return true,
+                    Ok(mut next) => to_visit.append(&mut next),
+                    Err(ret) => return Some(ret),
                 }
             }
         }
 
-        false
+        None
     }
 }

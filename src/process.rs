@@ -22,10 +22,31 @@ pub trait Process {
     fn from_node(node: Self::Node) -> Self;
 }
 
-/// A [`Process`] allowing to check if a graph contains any [`Node`]
-/// verifying a given predicate
-pub trait ContainsAny<P>: Process {
-    /// Check if a graph contains any [`Node`] verifying the given
-    /// predicate `pred`
-    fn contains_any(&self, pred: P) -> bool;
+/// A [`Process`] allowing to check a graph contains any [`Node`] verifying a
+/// given predicate
+pub trait Contains<P>: Process {
+    /// Check if a graph contains any [`Node`] verifying the given predicate
+    /// _pred_
+    fn contains(&self, pred: P) -> bool;
+}
+
+/// A [`Process`] allowing to find any [`Node`] verifying a given predicate
+pub trait FindAny<P>: Process {
+    /// Search for some item that matches with the given predicate
+    ///
+    /// This operation is similar to [`find()`](Iterator::find) but the item
+    /// returned may not be the **first** one.
+    ///
+    /// For a weighted graph, the _first_ element is the one with the lowest
+    /// distance from the start node.
+    fn find_any(&self, pred: P) -> Option<Self::Node>;
+}
+
+impl<FA, P> Contains<P> for FA
+where
+    FA: FindAny<P>,
+{
+    fn contains(&self, pred: P) -> bool {
+        self.find_any(pred).is_some()
+    }
 }

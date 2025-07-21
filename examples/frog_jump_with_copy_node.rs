@@ -95,7 +95,7 @@ fn main() {
 
     let is_solvable = root
         .as_process::<ParallelDFS<_>>()
-        .contains_any(|FrogNode { position, .. }| position == has_stone.len() - 1);
+        .contains(|FrogNode { position, .. }| position == has_stone.len() - 1);
 
     let stop = start.elapsed();
 
