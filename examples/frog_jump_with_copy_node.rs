@@ -53,8 +53,6 @@ impl Hash for FrogNode<'_> {
 }
 
 impl Node for FrogNode<'_> {
-    type Value = Self;
-
     fn outgoing(self) -> impl Iterator<Item = Self> {
         let small_speed = self.speed - 1;
         let big_speed = self.speed + 1;
@@ -70,10 +68,6 @@ impl Node for FrogNode<'_> {
                 speed,
                 has_stone: self.has_stone,
             })
-    }
-
-    fn value(self) -> Self::Value {
-        self
     }
 }
 

@@ -1,7 +1,7 @@
 //! This module contains the implementation of [`ParallelDFS`]
 
 use super::{FindAny, Process};
-use crate::Node;
+use crate::{AsValue, Node};
 use std::{collections::LinkedList, hash::Hash};
 
 type HashSet<K> = dashmap::DashSet<K, ahash::RandomState>;
@@ -25,23 +25,23 @@ where
     }
 }
 
-impl<N, P> FindAny<P> for ParallelDFS<N>
+impl<I, N, P> FindAny<I, P> for ParallelDFS<N>
 where
-    N: Copy + Eq + Hash + Node + Send + Sync,
-    P: Fn(N::Value) -> bool + Sync,
+    N: Copy + Eq + Hash + AsValue<I> + Node + Send + Sync,
+    P: Fn(I) -> bool + Sync,
 {
     fn find_any(&self, pred: P) -> Option<Self::Node> {
         use rayon::prelude::*;
 
-        fn next_until<N, P>(
+        fn next_until<I, N, P>(
             is_visited: &HashSet<N>,
             mut to_visit: Vec<N>,
             threshold: usize,
             pred: &P,
         ) -> Result<Vec<N>, N>
         where
-            N: Copy + Eq + Hash + Node,
-            P: Fn(N::Value) -> bool,
+            N: Copy + Eq + Hash + AsValue<I> + Node,
+            P: Fn(I) -> bool,
         {
             for _ in 0..threshold {
                 match to_visit.pop() {
@@ -52,7 +52,7 @@ where
                             let next = node.outgoing().filter(|node| !is_visited.contains(node));
 
                             for node in next {
-                                if pred(node.value()) {
+                                if pred(node.as_value()) {
                                     return Err(node);
                                 } else {
                                     to_visit.push(node);

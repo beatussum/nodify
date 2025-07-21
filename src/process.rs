@@ -24,14 +24,20 @@ pub trait Process {
 
 /// A [`Process`] allowing to check a graph contains any [`Node`] verifying a
 /// given predicate
-pub trait Contains<P>: Process {
+pub trait Contains<I, P>: Process
+where
+    P: Fn(I) -> bool,
+{
     /// Check if a graph contains any [`Node`] verifying the given predicate
     /// _pred_
     fn contains(&self, pred: P) -> bool;
 }
 
 /// A [`Process`] allowing to find any [`Node`] verifying a given predicate
-pub trait FindAny<P>: Process {
+pub trait FindAny<I, P>: Process
+where
+    P: Fn(I) -> bool,
+{
     /// Search for some item that matches with the given predicate
     ///
     /// This operation is similar to [`find()`](Iterator::find) but the item
@@ -42,9 +48,10 @@ pub trait FindAny<P>: Process {
     fn find_any(&self, pred: P) -> Option<Self::Node>;
 }
 
-impl<FA, P> Contains<P> for FA
+impl<I, FA, P> Contains<I, P> for FA
 where
-    FA: FindAny<P>,
+    FA: FindAny<I, P>,
+    P: Fn(I) -> bool,
 {
     fn contains(&self, pred: P) -> bool {
         self.find_any(pred).is_some()
