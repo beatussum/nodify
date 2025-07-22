@@ -27,7 +27,7 @@
 //!     let first = FiboNode::first();
 //!
 //!     let result = first
-//!         .nodifyied_with(&|FiboNode { previous, current }| {
+//!         .nodifyied_with(|FiboNode { previous, current }| {
 //!             let next = FiboNode {
 //!                 previous: current,
 //!                 current: previous + current,
@@ -46,20 +46,20 @@ use std::hash::{Hash, Hasher};
 
 /// An easy way to _nodify_ an entity given a _closure_
 #[derive(Debug, Clone, Copy)]
-pub struct Nodifyied<'a, C, F> {
+pub struct Nodifyied<C, F> {
     current: C,
-    outgoing_wrapper: &'a F,
+    outgoing_wrapper: F,
 }
 
-impl<C: PartialEq, F> PartialEq for Nodifyied<'_, C, F> {
+impl<C: PartialEq, F> PartialEq for Nodifyied<C, F> {
     fn eq(&self, other: &Self) -> bool {
         self.current == other.current
     }
 }
 
-impl<C: Eq, F> Eq for Nodifyied<'_, C, F> {}
+impl<C: Eq, F> Eq for Nodifyied<C, F> {}
 
-impl<C: Hash, F> Hash for Nodifyied<'_, C, F> {
+impl<C: Hash, F> Hash for Nodifyied<C, F> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.current.hash(state);
     }
@@ -76,7 +76,7 @@ pub trait NodifyiedWith {
     /// # Return value
     ///
     /// A [_nodifyied_](Nodifyied) type
-    fn nodifyied_with<F>(self, outgoing_wrapper: &F) -> Nodifyied<'_, Self, F>
+    fn nodifyied_with<F>(self, outgoing_wrapper: F) -> Nodifyied<Self, F>
     where
         Self: Sized,
     {
@@ -135,20 +135,20 @@ impl<T> NodifyiedWith for T {}
 /// In the above example, you can see that
 /// [`.contains()`](crate::process::Contains::contains) takes a `FiboNode` and
 /// not a [`Nodifyied`].
-impl<C, F> AsValue<C> for Nodifyied<'_, C, F> {
+impl<C, F> AsValue<C> for Nodifyied<C, F> {
     fn as_value(self) -> C {
         self.current
     }
 }
 
-impl<C, F, R> Node for Nodifyied<'_, C, F>
+impl<C, F, R> Node for Nodifyied<C, F>
 where
     C: Copy,
     F: Copy + Fn(C) -> R,
     R: Iterator<Item = C>,
 {
     fn outgoing(self) -> impl Iterator<Item = Self> {
-        (*self.outgoing_wrapper)(self.current).map(|current| Nodifyied {
+        (self.outgoing_wrapper)(self.current).map(move |current| Nodifyied {
             current,
             outgoing_wrapper: self.outgoing_wrapper,
         })

@@ -32,7 +32,7 @@ fn main() {
     let first = FiboNode::first();
 
     let result = first
-        .nodifyied_with(&|FiboNode { previous, current }| {
+        .nodifyied_with(|FiboNode { previous, current }| {
             let next = FiboNode {
                 previous: current,
                 current: previous + current,
