@@ -13,6 +13,12 @@ pub mod parallel_dfs;
 #[cfg(feature = "rayon")]
 pub use parallel_dfs::ParallelDFS;
 
+#[cfg(feature = "rayon")]
+pub mod delta;
+
+#[cfg(feature = "rayon")]
+pub use delta::DeltaStepping;
+
 /// A [`Process`] allowing to apply some transformations to a [`Node`]
 pub trait Process {
     /// The underlying [`Node`] type of this [`Process`]
@@ -46,4 +52,21 @@ where
     /// For a weighted graph, the _first_ element is the one with the lowest
     /// distance from the start node.
     fn find_any(&self, pred: P) -> Option<Self::Node>;
+}
+
+/// A [`Process`] allowing to find the first [`Node`] verifying a given
+/// predicate
+pub trait FindFirst<I, P>: Process
+where
+    P: Fn(I) -> bool,
+{
+    /// Search for the sequentially **first** item in the parallel iterator that
+    /// matches the given predicate and return it
+    ///
+    /// If you just want the first match that discovered anywhere in the graph,
+    /// [`.find_any()`](FindAny::find_any) is a better choice.
+    ///
+    /// For a weighted graph, the _first_ element is the one with the lowest
+    /// distance from the start node.
+    fn find_first(&self, pred: P) -> Option<Self::Node>;
 }
