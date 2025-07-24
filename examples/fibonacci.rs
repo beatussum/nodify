@@ -43,7 +43,7 @@ fn main() {
     let first = FiboNode::first();
 
     let result = first
-        .as_process::<DFS<_>>()
+        .to_process::<DFS<_>>()
         .contains(|FiboNode { current, .. }| current == 610);
 
     println!("{first:?} => {result}");

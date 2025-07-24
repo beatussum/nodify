@@ -1,7 +1,7 @@
 //! This module contains the implementation of [`ParallelDFS`]
 
 use super::{Contains, FindAny, Process};
-use crate::{AsValue, Node};
+use crate::{Node, ToValue};
 use std::{collections::LinkedList, hash::Hash};
 
 type HashSet<K> = dashmap::DashSet<K, ahash::RandomState>;
@@ -27,7 +27,7 @@ where
 
 impl<I, N, P> Contains<I, P> for ParallelDFS<N>
 where
-    N: Copy + Eq + Hash + AsValue<I> + Node + Send + Sync,
+    N: Copy + Eq + Hash + ToValue<I> + Node + Send + Sync,
     P: Fn(I) -> bool + Sync,
 {
     fn contains(&self, pred: P) -> bool {
@@ -37,7 +37,7 @@ where
 
 impl<I, N, P> FindAny<I, P> for ParallelDFS<N>
 where
-    N: Copy + Eq + Hash + AsValue<I> + Node + Send + Sync,
+    N: Copy + Eq + Hash + ToValue<I> + Node + Send + Sync,
     P: Fn(I) -> bool + Sync,
 {
     fn find_any(&self, pred: P) -> Option<Self::Node> {
@@ -50,7 +50,7 @@ where
             pred: &P,
         ) -> Result<Vec<N>, N>
         where
-            N: Copy + Eq + Hash + AsValue<I> + Node,
+            N: Copy + Eq + Hash + ToValue<I> + Node,
             P: Fn(I) -> bool,
         {
             for _ in 0..threshold {
@@ -62,7 +62,7 @@ where
                             let next = node.outgoing().filter(|node| !is_visited.contains(node));
 
                             for node in next {
-                                if pred(node.as_value()) {
+                                if pred(node.to_value()) {
                                     return Err(node);
                                 } else {
                                     to_visit.push(node);

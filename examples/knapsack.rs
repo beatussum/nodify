@@ -124,7 +124,7 @@ fn main() -> Result<(), &'static str> {
         value,
         ..
     } = root
-        .as_process::<DeltaStepping<_, _>>()
+        .to_process::<DeltaStepping<_, _>>()
         .with_delta(2)
         .find_first(|node| node.is_solution())
         .ok_or("No solution")?;

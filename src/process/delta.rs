@@ -1,7 +1,7 @@
 //! This module contains the implementation of [`DeltaStepping`]
 
 use super::{Contains, FindAny, FindFirst, Process};
-use crate::{AsValue, Node, Weighted};
+use crate::{Node, ToValue, Weighted};
 use num_traits::Unsigned;
 use rayon::prelude::*;
 use std::hash::Hash;
@@ -165,7 +165,7 @@ impl<N, W> DeltaStepping<N, W> {
     ///         value,
     ///         ..
     ///     } = root
-    ///         .as_process::<DeltaStepping<_, _>>()
+    ///         .to_process::<DeltaStepping<_, _>>()
     ///         .with_delta(2)
     ///         .find_first(|node| node.is_solution())
     ///         .ok_or("No solution")?;
@@ -210,7 +210,7 @@ where
 
 impl<I, N, P, W> Contains<I, P> for DeltaStepping<N, W>
 where
-    N: AsValue<I> + Copy + Eq + Hash + Node + Send + Sync + Weighted<Weight = W>,
+    N: ToValue<I> + Copy + Eq + Hash + Node + Send + Sync + Weighted<Weight = W>,
     P: Fn(I) -> bool + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
@@ -221,7 +221,7 @@ where
 
 impl<I, N, P, W> FindAny<I, P> for DeltaStepping<N, W>
 where
-    N: AsValue<I> + Copy + Eq + Hash + Node + Send + Sync + Weighted<Weight = W>,
+    N: ToValue<I> + Copy + Eq + Hash + Node + Send + Sync + Weighted<Weight = W>,
     P: Fn(I) -> bool + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
@@ -232,7 +232,7 @@ where
 
 impl<I, N, P, W> FindFirst<I, P> for DeltaStepping<N, W>
 where
-    N: AsValue<I> + Copy + Eq + Hash + Node + Send + Sync + Weighted<Weight = W>,
+    N: ToValue<I> + Copy + Eq + Hash + Node + Send + Sync + Weighted<Weight = W>,
     P: Fn(I) -> bool + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
@@ -252,7 +252,7 @@ where
                 let (&node, &dist) = r.pair();
                 (node, dist)
             })
-            .filter(|&(node, _)| pred(node.as_value()))
+            .filter(|&(node, _)| pred(node.to_value()))
             .min_by_key(|&(_, dist)| dist)
             .map(|(node, _)| node)
     }

@@ -15,15 +15,6 @@ pub mod process;
 
 use process::Process;
 
-/// A trait allowing to convert a [`Node`] to a given type
-///
-/// This trait aims to support [`Process`] predicate with an input type
-/// different from the node type.
-pub trait AsValue<I> {
-    /// Convert the [`Node`] to the given type
-    fn as_value(self) -> I;
-}
-
 /// A trait representing a [graph node](Node).
 ///
 /// This trait is based on the [`.outgoing()`](Node::outgoing), which allows to
@@ -31,25 +22,34 @@ pub trait AsValue<I> {
 /// possible to implement [`Process`es](Process) which rely on this method to
 /// travel the graph.
 pub trait Node {
+    /// Get the outgoing neighbors of the current [node](Node)
+    fn outgoing(self) -> impl Iterator<Item = Self>;
+
     /// Get the associated [`Process`] according to the given `P`
-    fn as_process<P>(self) -> P
+    fn to_process<P>(self) -> P
     where
         P: Process<Node = Self>,
         Self: Sized,
     {
         Process::from_node(self)
     }
-
-    /// Get the outgoing neighbors of the current [node](Node)
-    fn outgoing(self) -> impl Iterator<Item = Self>;
 }
 
 /// A trait implemention allowing [`AsValue`] to be
 /// [reflexive](https://en.wikipedia.org/wiki/Reflexive_relation).
-impl<N: Node> AsValue<Self> for N {
-    fn as_value(self) -> Self {
+impl<N: Node> ToValue<Self> for N {
+    fn to_value(self) -> Self {
         self
     }
+}
+
+/// A trait allowing to convert a [`Node`] to a given type
+///
+/// This trait aims to support [`Process`] predicate with an input type
+/// different from the node type.
+pub trait ToValue<I> {
+    /// Convert the [`Node`] to the given type
+    fn to_value(self) -> I;
 }
 
 /// A trait representing a [weighted graph node](Weighted).

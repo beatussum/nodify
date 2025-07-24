@@ -34,14 +34,14 @@
 //!             };
 //!             once(next)
 //!         })
-//!         .as_process::<DFS<_>>()
+//!         .to_process::<DFS<_>>()
 //!         .contains(|FiboNode { current, .. }| current == 610);
 //!
 //!     println!("{first:?} => {result}");
 //! }
 //! ```
 
-use crate::{AsValue, Node};
+use crate::{Node, ToValue};
 use std::hash::{Hash, Hasher};
 
 /// An easy way to _nodify_ an entity given a _closure_
@@ -125,7 +125,7 @@ impl<T> NodifyiedWith for T {}
 ///             };
 ///             once(next)
 ///         })
-///         .as_process::<DFS<_>>()
+///         .to_process::<DFS<_>>()
 ///         .contains(|FiboNode { current, .. }| current == 610);
 ///
 ///     println!("{first:?} => {result}");
@@ -135,8 +135,8 @@ impl<T> NodifyiedWith for T {}
 /// In the above example, you can see that
 /// [`.contains()`](crate::process::Contains::contains) takes a `FiboNode` and
 /// not a [`Nodifyied`].
-impl<C, F> AsValue<C> for Nodifyied<C, F> {
-    fn as_value(self) -> C {
+impl<C, F> ToValue<C> for Nodifyied<C, F> {
+    fn to_value(self) -> C {
         self.current
     }
 }

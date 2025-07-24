@@ -1,7 +1,7 @@
 //! This module contains the implementation of [`DFS`]
 
 use super::{Contains, FindAny, Process};
-use crate::{AsValue, Node};
+use crate::{Node, ToValue};
 use std::hash::Hash;
 
 /// A [DFS](https://en.wikipedia.org/wiki/Depth-first_search) implementation of some processes
@@ -22,7 +22,7 @@ impl<N: Node> Process for DFS<N> {
 
 impl<I, N, P> Contains<I, P> for DFS<N>
 where
-    N: Copy + Eq + Hash + AsValue<I> + Node,
+    N: Copy + Eq + Hash + ToValue<I> + Node,
     P: Fn(I) -> bool,
 {
     fn contains(&self, pred: P) -> bool {
@@ -32,7 +32,7 @@ where
 
 impl<I, N, P> FindAny<I, P> for DFS<N>
 where
-    N: Copy + Eq + Hash + AsValue<I> + Node,
+    N: Copy + Eq + Hash + ToValue<I> + Node,
     P: Fn(I) -> bool,
 {
     fn find_any(&self, pred: P) -> Option<Self::Node> {
@@ -42,7 +42,7 @@ where
         let mut to_visit = vec![self.node];
 
         while let Some(node) = to_visit.pop() {
-            if pred(node.as_value()) {
+            if pred(node.to_value()) {
                 return Some(node);
             } else if is_visited.insert(node) {
                 let next = node.outgoing().filter(|node| !is_visited.contains(node));
