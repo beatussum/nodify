@@ -4,7 +4,7 @@ use super::{Contains, FindAny, FindFirst, Process};
 use crate::{ToValue, Weighted};
 use num_traits::Unsigned;
 use rayon::prelude::*;
-use std::hash::Hash;
+use std::{cmp::min_by_key, collections::LinkedList, hash::Hash, mem::swap};
 
 type HashMap<K, V> = dashmap::DashMap<K, V, ahash::RandomState>;
 type HashMultiMap<K, V> = HashMap<K, Vec<V>>;
@@ -206,7 +206,7 @@ where
 impl<I, N, P, W> Contains<I, P> for DeltaStepping<N, W>
 where
     N: ToValue<I> + Copy + Eq + Hash + Send + Sync + Weighted<Weight = W>,
-    P: Fn(I) -> bool + Sync,
+    P: Copy + Fn(I) -> bool + Send + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
     fn contains(&self, pred: P) -> bool {
@@ -217,7 +217,7 @@ where
 impl<I, N, P, W> FindAny<I, P> for DeltaStepping<N, W>
 where
     N: ToValue<I> + Copy + Eq + Hash + Send + Sync + Weighted<Weight = W>,
-    P: Fn(I) -> bool + Sync,
+    P: Copy + Fn(I) -> bool + Send + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
     fn find_any(&self, pred: P) -> Option<Self::Node> {
@@ -228,46 +228,43 @@ where
 impl<I, N, P, W> FindFirst<I, P> for DeltaStepping<N, W>
 where
     N: ToValue<I> + Copy + Eq + Hash + Send + Sync + Weighted<Weight = W>,
-    P: Fn(I) -> bool + Sync,
+    P: Copy + Fn(I) -> bool + Send + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
     fn find_first(&self, pred: P) -> Option<Self::Node> {
-        use std::collections::LinkedList;
+        use ExploredList::*;
 
         while let Some(first_index) = self.first_bucket_index() {
-            let mut heavy_edges = LinkedList::default();
+            let mut explored_list = ExploredList::default();
 
             while let Some((_, first_bucket)) = self.buckets.remove(&first_index) {
                 let mut to_append = first_bucket
                     .into_par_iter()
-                    .fold(LinkedList::new, |mut list, node| {
-                        let to_push = self.node(node).explore();
-                        list.push_back(to_push);
+                    .fold(ExploredList::default, |mut list, node| {
+                        let to_push = self.node(node).explore(pred);
+                        list.push(to_push);
                         list
                     })
-                    .reduce(LinkedList::new, |mut lhs, mut rhs| {
+                    .reduce(ExploredList::default, |mut lhs, mut rhs| {
                         lhs.append(&mut rhs);
                         lhs
                     });
 
-                heavy_edges.append(&mut to_append);
+                explored_list.append(&mut to_append);
             }
 
-            heavy_edges
-                .into_par_iter()
-                .flatten()
-                .for_each(|(new_dist, node)| self.node(node).relax(new_dist));
+            match explored_list {
+                Solved((_, node)) => return Some(node),
+                Unsolved(heavy_edges) => {
+                    heavy_edges
+                        .into_par_iter()
+                        .flatten()
+                        .for_each(|(new_dist, node)| self.node(node).relax(new_dist));
+                }
+            }
         }
 
-        self.dists
-            .par_iter()
-            .map(|r| {
-                let (&node, &dist) = r.pair();
-                (node, dist)
-            })
-            .filter(|&(node, _)| pred(node.to_value()))
-            .min_by_key(|&(_, dist)| dist)
-            .map(|(node, _)| node)
+        None
     }
 }
 
@@ -283,7 +280,13 @@ where
     N: Copy + Eq + Hash + Weighted<Weight = W>,
     W: Copy + Hash + Ord + Unsigned,
 {
-    fn explore(self) -> Vec<(W, N)> {
+    fn explore<I, P>(self, pred: P) -> Explored<W, N>
+    where
+        N: ToValue<I>,
+        P: Fn(I) -> bool,
+    {
+        use Explored::*;
+
         let Self {
             node,
             delta,
@@ -297,6 +300,10 @@ where
             .as_deref()
             .copied()
             .unwrap_or_else(W::zero);
+
+        if pred(node.to_value()) {
+            return Solved((base_dist, node));
+        }
 
         let mut heavy_edges = Vec::default();
 
@@ -317,7 +324,7 @@ where
             }
         }
 
-        heavy_edges
+        Unsolved(heavy_edges)
     }
 }
 
@@ -344,5 +351,59 @@ where
                 .or_default()
                 .push(self.node);
         }
+    }
+}
+
+enum Explored<W, N> {
+    Solved((W, N)),
+    Unsolved(Vec<(W, N)>),
+}
+
+enum ExploredList<W, N> {
+    Solved((W, N)),
+    Unsolved(LinkedList<Vec<(W, N)>>),
+}
+
+impl<W, N> ExploredList<W, N>
+where
+    N: Copy,
+    W: Copy + Ord,
+{
+    pub fn append(&mut self, other: &mut Self) {
+        use ExploredList::*;
+
+        match self {
+            Solved(s) => {
+                if let &mut Solved(other) = other {
+                    *s = min_by_key(*s, other, |&(w, _)| w);
+                }
+            }
+
+            Unsolved(s) => match other {
+                Solved(_) => swap(self, other),
+                Unsolved(other) => s.append(other),
+            },
+        }
+    }
+
+    pub fn push(&mut self, value: Explored<W, N>) {
+        match self {
+            Self::Solved(s) => {
+                if let Explored::Solved(value) = value {
+                    *s = min_by_key(*s, value, |&(w, _)| w);
+                }
+            }
+
+            Self::Unsolved(s) => match value {
+                Explored::Solved(value) => *self = Self::Solved(value),
+                Explored::Unsolved(value) => s.push_back(value),
+            },
+        }
+    }
+}
+
+impl<W, N> Default for ExploredList<W, N> {
+    fn default() -> Self {
+        Self::Unsolved(LinkedList::default())
     }
 }
