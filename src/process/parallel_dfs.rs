@@ -14,10 +14,7 @@ pub struct ParallelDFS<N> {
     node: N,
 }
 
-impl<N> Process for ParallelDFS<N>
-where
-    N: Node,
-{
+impl<N> Process for ParallelDFS<N> {
     type Node = N;
 
     fn from_node(node: Self::Node) -> Self {

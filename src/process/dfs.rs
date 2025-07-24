@@ -12,7 +12,7 @@ pub struct DFS<N> {
     node: N,
 }
 
-impl<N: Node> Process for DFS<N> {
+impl<N> Process for DFS<N> {
     type Node = N;
 
     fn from_node(node: Self::Node) -> Self {

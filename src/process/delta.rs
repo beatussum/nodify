@@ -1,7 +1,7 @@
 //! This module contains the implementation of [`DeltaStepping`]
 
 use super::{Contains, FindAny, FindFirst, Process};
-use crate::{Node, ToValue, Weighted};
+use crate::{ToValue, Weighted};
 use num_traits::Unsigned;
 use rayon::prelude::*;
 use std::hash::Hash;
@@ -189,7 +189,7 @@ impl<N, W> DeltaStepping<N, W> {
 
 impl<N, W> Process for DeltaStepping<N, W>
 where
-    N: Copy + Eq + Hash + Node,
+    N: Copy + Eq + Hash,
     W: Default + Eq + Hash + Unsigned,
 {
     type Node = N;
@@ -210,7 +210,7 @@ where
 
 impl<I, N, P, W> Contains<I, P> for DeltaStepping<N, W>
 where
-    N: ToValue<I> + Copy + Eq + Hash + Node + Send + Sync + Weighted<Weight = W>,
+    N: ToValue<I> + Copy + Eq + Hash + Send + Sync + Weighted<Weight = W>,
     P: Fn(I) -> bool + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
@@ -221,7 +221,7 @@ where
 
 impl<I, N, P, W> FindAny<I, P> for DeltaStepping<N, W>
 where
-    N: ToValue<I> + Copy + Eq + Hash + Node + Send + Sync + Weighted<Weight = W>,
+    N: ToValue<I> + Copy + Eq + Hash + Send + Sync + Weighted<Weight = W>,
     P: Fn(I) -> bool + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
@@ -232,7 +232,7 @@ where
 
 impl<I, N, P, W> FindFirst<I, P> for DeltaStepping<N, W>
 where
-    N: ToValue<I> + Copy + Eq + Hash + Node + Send + Sync + Weighted<Weight = W>,
+    N: ToValue<I> + Copy + Eq + Hash + Send + Sync + Weighted<Weight = W>,
     P: Fn(I) -> bool + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {

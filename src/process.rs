@@ -2,8 +2,6 @@
 //!
 //! This module contains several different [`Process`es](Process)
 
-use crate::Node;
-
 pub mod dfs;
 pub use dfs::DFS;
 
@@ -22,7 +20,7 @@ pub use delta::DeltaStepping;
 /// A [`Process`] allowing to apply some transformations to a [`Node`]
 pub trait Process {
     /// The underlying [`Node`] type of this [`Process`]
-    type Node: Node;
+    type Node;
 
     /// Build a [`Process`] from a [`Node`]
     fn from_node(node: Self::Node) -> Self;
