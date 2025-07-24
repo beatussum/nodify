@@ -338,11 +338,11 @@ where
 
         if let Some(new_dist) = to_insert {
             self.dists.insert(self.node, new_dist);
-        }
 
-        self.buckets
-            .entry(new_dist / self.delta)
-            .or_default()
-            .push(self.node);
+            self.buckets
+                .entry(new_dist / self.delta)
+                .or_default()
+                .push(self.node);
+        }
     }
 }
