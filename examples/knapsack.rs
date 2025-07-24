@@ -120,7 +120,7 @@ fn main() -> Result<(), &'static str> {
     let root = Knapsack::new(capacity, &items).ok_or("Root creation failed")?;
 
     let Knapsack {
-        mut capacity,
+        capacity: mut weight,
         value,
         ..
     } = root
@@ -129,9 +129,9 @@ fn main() -> Result<(), &'static str> {
         .find_first(|node| node.is_solution())
         .ok_or("No solution")?;
 
-    capacity = capacity - capacity;
+    weight = capacity - weight;
 
-    println!("weight = {capacity}, value = {value}");
+    println!("value = {value}, weight = {weight}");
 
     Ok(())
 }
