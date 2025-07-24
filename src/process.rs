@@ -47,13 +47,3 @@ where
     /// distance from the start node.
     fn find_any(&self, pred: P) -> Option<Self::Node>;
 }
-
-impl<I, FA, P> Contains<I, P> for FA
-where
-    FA: FindAny<I, P>,
-    P: Fn(I) -> bool,
-{
-    fn contains(&self, pred: P) -> bool {
-        self.find_any(pred).is_some()
-    }
-}

@@ -1,6 +1,6 @@
 //! This module contains the implementation of [`ParallelDFS`]
 
-use super::{FindAny, Process};
+use super::{Contains, FindAny, Process};
 use crate::{AsValue, Node};
 use std::{collections::LinkedList, hash::Hash};
 
@@ -22,6 +22,16 @@ where
 
     fn from_node(node: Self::Node) -> Self {
         Self { node }
+    }
+}
+
+impl<I, N, P> Contains<I, P> for ParallelDFS<N>
+where
+    N: Copy + Eq + Hash + AsValue<I> + Node + Send + Sync,
+    P: Fn(I) -> bool + Sync,
+{
+    fn contains(&self, pred: P) -> bool {
+        self.find_any(pred).is_some()
     }
 }
 

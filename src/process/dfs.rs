@@ -1,6 +1,6 @@
 //! This module contains the implementation of [`DFS`]
 
-use super::{FindAny, Process};
+use super::{Contains, FindAny, Process};
 use crate::{AsValue, Node};
 use std::hash::Hash;
 
@@ -17,6 +17,16 @@ impl<N: Node> Process for DFS<N> {
 
     fn from_node(node: Self::Node) -> Self {
         Self { node }
+    }
+}
+
+impl<I, N, P> Contains<I, P> for DFS<N>
+where
+    N: Copy + Eq + Hash + AsValue<I> + Node,
+    P: Fn(I) -> bool,
+{
+    fn contains(&self, pred: P) -> bool {
+        self.find_any(pred).is_some()
     }
 }
 
