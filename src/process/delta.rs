@@ -28,17 +28,12 @@ where
     N: Send + Sync,
     W: Copy + Eq + Hash + Ord + Send + Sync,
 {
-    fn first_bucket(&self) -> Option<Vec<N>> {
-        let first = self
-            .buckets
+    fn first_bucket_index(&self) -> Option<W> {
+        self.buckets
             .par_iter_mut()
             .filter(|r| !r.value().is_empty())
-            .min_by_key(|r| *r.key())
-            .map(|r| *r.key());
-
-        first
-            .and_then(|ref first| self.buckets.remove(first))
-            .map(|(_, bucket)| bucket)
+            .map(|r| *r.key())
+            .min()
     }
 }
 
@@ -237,13 +232,31 @@ where
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
     fn find_first(&self, pred: P) -> Option<Self::Node> {
-        while let Some(first) = self.first_bucket() {
-            first
+        use std::collections::LinkedList;
+
+        while let Some(first_index) = self.first_bucket_index() {
+            let mut heavy_edges = LinkedList::default();
+
+            while let Some((_, first_bucket)) = self.buckets.remove(&first_index) {
+                let mut to_append = first_bucket
+                    .into_par_iter()
+                    .fold(LinkedList::new, |mut list, node| {
+                        let to_push = self.node(node).explore();
+                        list.push_back(to_push);
+                        list
+                    })
+                    .reduce(LinkedList::new, |mut lhs, mut rhs| {
+                        lhs.append(&mut rhs);
+                        lhs
+                    });
+
+                heavy_edges.append(&mut to_append);
+            }
+
+            heavy_edges
                 .into_par_iter()
-                .flat_map(|node| self.node(node).explore())
-                .for_each(|(new_dist, node)| {
-                    self.node(node).relax(new_dist);
-                });
+                .flatten()
+                .for_each(|(new_dist, node)| self.node(node).relax(new_dist));
         }
 
         self.dists
