@@ -7,6 +7,7 @@ use std::hash::Hash;
 /// A [DFS](https://en.wikipedia.org/wiki/Depth-first_search) implementation of some processes
 ///
 /// In particular, the following [`Process`es](Process) are implemented:
+/// - [`Contains`],
 /// - [`FindAny`].
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct DFS<N> {
