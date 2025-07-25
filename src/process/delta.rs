@@ -307,11 +307,10 @@ where
 
         let mut heavy_edges = Vec::default();
 
-        for (new_dist, node) in node
-            .weighted_outgoing()
-            .map(|(w, node)| (base_dist + w, node))
-        {
-            if new_dist > delta {
+        for (w, node) in node.weighted_outgoing() {
+            let new_dist = base_dist + w;
+
+            if w > delta {
                 heavy_edges.push((new_dist, node));
             } else {
                 Self {
