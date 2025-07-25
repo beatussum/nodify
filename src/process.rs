@@ -17,27 +17,28 @@ pub mod delta;
 #[cfg(feature = "rayon")]
 pub use delta::DeltaStepping;
 
-/// A [`Process`] allowing to apply some transformations to a [`Node`]
+/// A [`Process`] allowing to apply some transformations to a [`super::Node`]
 pub trait Process {
-    /// The underlying [`Node`] type of this [`Process`]
+    /// The underlying [`super::Node`] type of this [`Process`]
     type Node;
 
-    /// Build a [`Process`] from a [`Node`]
+    /// Build a [`Process`] from a [`super::Node`]
     fn from_node(node: Self::Node) -> Self;
 }
 
-/// A [`Process`] allowing to check a graph contains any [`Node`] verifying a
-/// given predicate
+/// A [`Process`] allowing to check a graph contains any [`super::Node`]
+/// verifying a given predicate
 pub trait Contains<I, P>: Process
 where
     P: Fn(I) -> bool,
 {
-    /// Check if a graph contains any [`Node`] verifying the given predicate
-    /// _pred_
+    /// Check if a graph contains any [`super::Node`] verifying the given
+    /// predicate _pred_
     fn contains(&self, pred: P) -> bool;
 }
 
-/// A [`Process`] allowing to find any [`Node`] verifying a given predicate
+/// A [`Process`] allowing to find any [`super::Node`] verifying a given
+/// predicate
 pub trait FindAny<I, P>: Process
 where
     P: Fn(I) -> bool,
@@ -52,7 +53,7 @@ where
     fn find_any(&self, pred: P) -> Option<Self::Node>;
 }
 
-/// A [`Process`] allowing to find the first [`Node`] verifying a given
+/// A [`Process`] allowing to find the first [`super::Node`] verifying a given
 /// predicate
 pub trait FindFirst<I, P>: Process
 where

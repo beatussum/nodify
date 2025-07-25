@@ -35,7 +35,7 @@ pub trait Node {
     }
 }
 
-/// A trait implemention allowing [`AsValue`] to be
+/// A trait implemention allowing [`ToValue`] to be
 /// [reflexive](https://en.wikipedia.org/wiki/Reflexive_relation).
 impl<N: Node> ToValue<Self> for N {
     fn to_value(self) -> Self {
