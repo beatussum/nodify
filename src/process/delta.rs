@@ -4,7 +4,14 @@ use super::{Contains, FindAny, FindFirst, Process};
 use crate::{ToValue, Weighted};
 use num_traits::Unsigned;
 use rayon::prelude::*;
-use std::{cmp::min_by_key, collections::LinkedList, hash::Hash, mem::swap};
+
+use std::{
+    cmp::min_by_key,
+    collections::LinkedList,
+    fmt::{Debug, Formatter},
+    hash::Hash,
+    mem::swap,
+};
 
 type HashMap<K, V> = dashmap::DashMap<K, V, ahash::RandomState>;
 type HashMultiMap<K, V> = HashMap<K, Vec<V>>;
@@ -182,6 +189,45 @@ impl<N, W> DeltaStepping<N, W> {
     }
 }
 
+impl<N, W> Clone for DeltaStepping<N, W>
+where
+    N: Copy + Eq + Hash,
+    W: Copy + Eq + Hash,
+{
+    fn clone(&self) -> Self {
+        Self {
+            base: self.base,
+            delta: self.delta,
+            buckets: self.buckets.clone(),
+            dists: self.dists.clone(),
+        }
+    }
+}
+
+impl<N, W> Debug for DeltaStepping<N, W>
+where
+    W: Debug + Eq + Hash,
+    N: Debug + Eq + Hash,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        writeln!(
+            f,
+            "DeltaStepping {{ base: {:?}, delta: {:?}, buckets: {:?}, dists: {:?} }}",
+            self.base, self.delta, self.buckets, self.dists
+        )
+    }
+}
+
+impl<N, W> Default for DeltaStepping<N, W>
+where
+    N: Copy + Default + Eq + Hash,
+    W: Default + Eq + Hash + Unsigned,
+{
+    fn default() -> Self {
+        Self::from_node(N::default())
+    }
+}
+
 impl<N, W> Process for DeltaStepping<N, W>
 where
     N: Copy + Eq + Hash,
@@ -353,11 +399,27 @@ where
     }
 }
 
+impl<N, W> Debug for DeltaSteppingNode<'_, N, W>
+where
+    W: Debug + Eq + Hash,
+    N: Debug + Eq + Hash,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        writeln!(
+            f,
+            "DeltaSteppingNode {{ node: {:?}, delta: {:?}, buckets: {:?}, dists: {:?} }}",
+            self.node, self.delta, self.buckets, self.dists
+        )
+    }
+}
+
+#[derive(Debug)]
 enum Explored<W, N> {
     Solved((W, N)),
     Unsolved(Vec<(W, N)>),
 }
 
+#[derive(Debug)]
 enum ExploredList<W, N> {
     Solved((W, N)),
     Unsolved(LinkedList<Vec<(W, N)>>),
