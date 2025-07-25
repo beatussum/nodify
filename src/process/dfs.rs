@@ -8,7 +8,7 @@ use std::hash::Hash;
 ///
 /// In particular, the following [`Process`es](Process) are implemented:
 /// - [`FindAny`].
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct DFS<N> {
     node: N,
 }
@@ -23,7 +23,7 @@ impl<N> Process for DFS<N> {
 
 impl<I, N, P> Contains<I, P> for DFS<N>
 where
-    N: Copy + Eq + Hash + ToValue<I> + Node,
+    N: Copy + Eq + Hash + Node + ToValue<I>,
     P: Fn(I) -> bool,
 {
     fn contains(&self, pred: P) -> bool {
@@ -33,7 +33,7 @@ where
 
 impl<I, N, P> FindAny<I, P> for DFS<N>
 where
-    N: Copy + Eq + Hash + ToValue<I> + Node,
+    N: Copy + Eq + Hash + Node + ToValue<I>,
     P: Fn(I) -> bool,
 {
     fn find_any(&self, pred: P) -> Option<Self::Node> {

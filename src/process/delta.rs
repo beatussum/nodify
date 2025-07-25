@@ -251,7 +251,7 @@ where
 
 impl<I, N, P, W> Contains<I, P> for DeltaStepping<N, W>
 where
-    N: ToValue<I> + Copy + Eq + Hash + Send + Sync + Weighted<Weight = W>,
+    N: Copy + Eq + Hash + Send + Sync + ToValue<I> + Weighted<Weight = W>,
     P: Copy + Fn(I) -> bool + Send + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
@@ -262,7 +262,7 @@ where
 
 impl<I, N, P, W> FindAny<I, P> for DeltaStepping<N, W>
 where
-    N: ToValue<I> + Copy + Eq + Hash + Send + Sync + Weighted<Weight = W>,
+    N: Copy + Eq + Hash + Send + Sync + ToValue<I> + Weighted<Weight = W>,
     P: Copy + Fn(I) -> bool + Send + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {
@@ -273,7 +273,7 @@ where
 
 impl<I, N, P, W> FindFirst<I, P> for DeltaStepping<N, W>
 where
-    N: ToValue<I> + Copy + Eq + Hash + Send + Sync + Weighted<Weight = W>,
+    N: Copy + Eq + Hash + Send + Sync + ToValue<I> + Weighted<Weight = W>,
     P: Copy + Fn(I) -> bool + Send + Sync,
     W: Copy + Default + Eq + Hash + Ord + Send + Sync + Unsigned,
 {

@@ -10,7 +10,7 @@ type HashSet<K> = dashmap::DashSet<K, ahash::RandomState>;
 ///
 /// In particular, the following [`Process`es](Process) are implemented:
 /// - [`FindAny`].
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ParallelDFS<N> {
     node: N,
 }
@@ -25,7 +25,7 @@ impl<N> Process for ParallelDFS<N> {
 
 impl<I, N, P> Contains<I, P> for ParallelDFS<N>
 where
-    N: Copy + Eq + Hash + ToValue<I> + Node + Send + Sync,
+    N: Copy + Eq + Hash + Node + Send + Sync + ToValue<I>,
     P: Fn(I) -> bool + Sync,
 {
     fn contains(&self, pred: P) -> bool {
@@ -35,7 +35,7 @@ where
 
 impl<I, N, P> FindAny<I, P> for ParallelDFS<N>
 where
-    N: Copy + Eq + Hash + ToValue<I> + Node + Send + Sync,
+    N: Copy + Eq + Hash + Node + Send + Sync + ToValue<I>,
     P: Fn(I) -> bool + Sync,
 {
     fn find_any(&self, pred: P) -> Option<Self::Node> {

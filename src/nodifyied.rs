@@ -45,7 +45,7 @@ use crate::{Node, ToValue};
 use std::hash::{Hash, Hasher};
 
 /// An easy way to _nodify_ an entity given a _closure_
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Nodifyied<C, F> {
     current: C,
     outgoing_wrapper: F,
