@@ -8,6 +8,7 @@ use std::hash::Hash;
 ///
 /// In particular, the following [`Process`es](Process) are implemented:
 /// - [`FindAny`].
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub struct DFS<N> {
     node: N,
 }

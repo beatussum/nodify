@@ -10,6 +10,7 @@ type HashSet<K> = dashmap::DashSet<K, ahash::RandomState>;
 ///
 /// In particular, the following [`Process`es](Process) are implemented:
 /// - [`FindAny`].
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub struct ParallelDFS<N> {
     node: N,
 }
