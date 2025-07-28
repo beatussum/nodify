@@ -31,16 +31,16 @@ impl FiboNode {
 fn main() {
     let first = FiboNode::first();
 
-    let result = first
-        .nodifyied_with(|FiboNode { previous, current }| {
-            let next = FiboNode {
-                previous: current,
-                current: previous + current,
-            };
-            once(next)
-        })
-        .to_process::<DFS<_>>()
-        .contains(|FiboNode { current, .. }| current == 610);
+    let result = NodifyiedBuilder::new(|FiboNode { previous, current }| {
+        let next = FiboNode {
+            previous: current,
+            current: previous + current,
+        };
+        once(next)
+    })
+    .build(first)
+    .to_process::<DFS<_>>()
+    .contains(|FiboNode { current, .. }| current == 610);
 
     println!("{first:?} => {result}");
 }
