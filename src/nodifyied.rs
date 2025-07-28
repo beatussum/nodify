@@ -20,6 +20,7 @@ use std::hash::{Hash, Hasher};
 /// `examples/simple_nodifyied.rs`.
 ///
 /// ```rust
+#[allow(clippy::needless_doctest_main)]
 #[doc = include_str!("../examples/simple_nodifyied.rs")]
 /// ```
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
@@ -111,6 +112,7 @@ impl<C: Hash, F> Hash for Nodifyied<'_, C, F> {
 /// You can consult the complete version of this example at `examples/nodifyied.rs`.
 ///
 /// ```rust
+#[allow(clippy::needless_doctest_main)]
 #[doc = include_str!("../examples/nodifyied.rs")]
 /// ```
 ///
