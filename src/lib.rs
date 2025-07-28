@@ -1,10 +1,4 @@
-//! # nodify
-//!
-//! ## Why should I use nodify?
-//!
-//! This crate aims to provide an easy way to implement graph algorithms like
-//! graph routing and path finding.
-
+#![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(missing_docs)]

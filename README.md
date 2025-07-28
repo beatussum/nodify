@@ -15,10 +15,15 @@
 ## Description
 
 This small _crate_ aims to provide a easy way to apply computations on problem using graph to be resolved.
-For the time being, only `ContainsAny` process is supported allowing to find any node verifying a given predicate. This process is implemented using [DFS](https://en.wikipedia.org/wiki/Depth-first_search) with a sequential variant and a parallel one.
+For the time being, only the followings are supported:
+- `Contains` allowing to check whether any node verifying a given predicate;
+- `FindAny` allowing to find any node verifying a given predicate;
+- `FindFirst` allowing to find the _first node_ (i.e. the one with the shortest path) verifying a given predicate.
 
-With this _crate_, you just need to implement the `Node` trait with the `outgoing()` method to be able to apply process.
-All processes and process implementations are stored under `nodify::process::*`
+`Contains` and `FindAny` is implemented using [DFS](https://en.wikipedia.org/wiki/Depth-first_search) with a sequential variant and a parallel one. A [delta stepping algorithm](https://en.wikipedia.org/wiki/Parallel_single-source_shortest_path_algorithm#Delta_stepping_algorithm) implements `Contains`, `FindFirst` and `FindAny`.
+
+With this _crate_, you just need to implement the `Node` trait with the `outgoing()` method to be able to apply processes.
+All processes and process implementations are stored under `nodify::process::*`.
 
 ## Example
 
@@ -68,14 +73,14 @@ fn main() {
     let first = FiboNode::first();
 
     let result = first
-        .process::<DFS<_>>()
-        .contains_any(|FiboNode { current, .. }| current == 610);
+        .to_process::<DFS<_>>()
+        .contains(|FiboNode { current, .. }| current == 610);
 
     println!("{first:?} => {result}");
 }
 ```
 
-You can consult this example at [`examples/fibonacci.rs`](examples/fibonacci.rs).
+You can consult this example at `examples/fibonacci.rs`.
 
 ## Building
 
@@ -119,4 +124,4 @@ cargo add nodify
 ## Licenses
 
 As explained above, the code of this software is licensed under GPL-3 or any later version.
-Details of the rights applying to the various third-party files are described in the [copyright](copyright) file in [the Debian `debian/copyright` file format](https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/).
+Details of the rights applying to the various third-party files are described in the `copyright` file in [the Debian `debian/copyright` file format](https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/).
